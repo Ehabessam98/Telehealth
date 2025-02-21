@@ -1,87 +1,122 @@
 import streamlit as st
+
+# Set page configuration
+st.set_page_config(page_title="COPD Telehealth", layout="wide")
+
+# Customizing the style
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #F5E8C7;
+    }
+    .stButton>button {
+        background-color: #E67E22;
+        color: white;
+        border-radius: 8px;
+        width: 100%;
+    }
+    .stSuccess {
+        color: green;
+    }
+    .stError {
+        color: red;
+    }
+    .css-1cpxqw2 {
+        background-color: #F4D03F !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Title with styling
+st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
+
+# Sidebar for Patient Info
+st.sidebar.header("🩺 Patient Information")
+patient_name = st.sidebar.text_input("Patient Name", "John Doe")
+age = st.sidebar.slider("Age", 40, 90, 65)
+oxygen_level = st.sidebar.slider("Oxygen Saturation (%)", 70, 100, 95)
+spirometry_value = st.sidebar.slider("Spirometry (FEV1 %)", 30, 100, 65)
+peak_flow = st.sidebar.slider("Peak Flow (L/min)", 100, 600, 350)
+symptoms = st.sidebar.text_area("Symptoms", "Shortness of breath, fatigue")
+
+# Main layout
+col1, col2 = st.columns([1, 2])
+
+with col1:
+    st.subheader("👤 Patient Details")
+    st.info(f"**Name:** {patient_name}")
+    st.write(f"**Age:** {age}")
+    st.write(f"**Oxygen Level:** {oxygen_level}%")
+    st.write(f"**Spirometry (FEV1):** {spirometry_value}%")
+    st.write(f"**Peak Flow:** {peak_flow} L/min")
+    st.write(f"**Symptoms:** {symptoms}")
+
+# Severity Assessment
+def assess_severity(oxygen, fev1):
+    if oxygen < 90 or fev1 < 50:
+        return "🔴 High Risk - Needs Urgent Attention!", "danger"
+    elif 90 <= oxygen <= 94 or 50 <= fev1 < 70:
+        return "🟠 Moderate Risk - Requires Monitoring.", "warning"
+    else:
+        return "🟢 Low Risk - Stable Condition.", "success"
+
+severity_message, severity_status = assess_severity(oxygen_level, spirometry_value)
+
+with col2:
+    st.subheader("📊 Severity Assessment")
+    if severity_status == "danger":
+        st.error(severity_message)
+    elif severity_status == "warning":
+        st.warning(severity_message)
+    else:
+        st.success(severity_message)
+
+# Teleconsultation Process
+st.subheader("📞 Teleconsultation Process")
+if st.button("Send Data to Remote Consultant"):
+    st.success("✅ Data sent successfully!")
+    st.info("Consultant is reviewing the data...")
+
+    # Simulated Diagnosis & Recommendation
+    diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
+    
+    st.subheader("💡 Consultant's Recommendation")
+    if diagnosis == "Stable":
+        st.success("✔ Patient is stable. Continue current treatment and monitor regularly.")
+    else:
+        st.error("⚠ Immediate intervention needed! Consider medication adjustment or hospitalization.")
+
+st.write("**Workflow:** 🏥 Rural hospital → 🩺 Nurse collects data → 👨‍⚕️ Consultant reviews → 🏠 Patient receives treatment plan.")
+
+# Next Steps
+st.subheader("✅ Next Steps")
+st.write("✔ Train nurses on telehealth devices.")
+st.write("✔ Set up secure video consultation platform.")
+st.write("✔ Establish a follow-up plan for COPD patients.")
+
+# Option to Download Report
 import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
 
-# Load Google service account credentials from Streamlit secrets
-service_account_info = st.secrets["google"]  # Already a dictionary, no need to parse
-creds = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
-client = gspread.authorize(creds)
+patient_data = {
+    "Name": [patient_name],
+    "Age": [age],
+    "Oxygen Level (%)": [oxygen_level],
+    "Spirometry (FEV1 %)": [spirometry_value],
+    "Peak Flow (L/min)": [peak_flow],
+    "Symptoms": [symptoms],
+    "Risk Assessment": [severity_message]
+}
 
-# Google Sheets Setup
-SHEET_URL = "https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
-sheet = client.open_by_url(SHEET_URL).sheet1
+df = pd.DataFrame(patient_data)
 
-# Define Sheet Headers
-headers = ["Patient Name", "Age", "Oxygen Level", "Spirometry", "Peak Flow", "Symptoms", "Diagnosis", "Recommendation"]
+st.download_button(
+    label="📥 Download Patient Report (CSV)",
+    data=df.to_csv(index=False).encode("utf-8"),
+    file_name=f"{patient_name}_COPD_Report.csv",
+    mime="text/csv",
+)
 
-# Check if headers exist, if not, insert them
-existing_data = sheet.get_all_values()
-if not existing_data:
-    sheet.insert_row(headers, 1)
-elif existing_data[0] != headers:
-    sheet.insert_row(headers, 1)
-
-# Streamlit UI
-st.title("COPD Telehealth Program")
-
-# Choose Role: GP or Consultant
-role = st.sidebar.selectbox("Select Role", ["General Practitioner (GP)", "Consultant"])
-
-# 🔹 **GP Interface: Enter Patient Data**
-if role == "General Practitioner (GP)":
-    st.header("GP Interface - Enter Patient Data")
-
-    # Patient Data Inputs
-    patient_name = st.text_input("Patient Name")
-    age = st.slider("Age", 1, 100, 40)
-    oxygen_level = st.slider("Oxygen Saturation (%)", 70, 100, 95)
-    spirometry_value = st.slider("Spirometry (FEV1 %)", 30, 100, 65)
-    peak_flow = st.slider("Peak Flow (L/min)", 100, 600, 350)
-    symptoms = st.text_area("Symptoms", "Shortness of breath, fatigue")
-
-    # Submit Data to Google Sheets
-    if st.button("Send to Consultant"):
-        if patient_name:
-            new_data = [patient_name, age, oxygen_level, spirometry_value, peak_flow, symptoms, "", ""]
-            sheet.append_row(new_data)
-            st.success("Patient data sent to consultant!")
-        else:
-            st.error("Please enter a patient name.")
-
-# 🔹 **Consultant Interface: Review & Provide Feedback**
-elif role == "Consultant":
-    st.header("Consultant Interface - Review & Provide Feedback")
-
-    # Fetch Data from Google Sheets
-    data = sheet.get_all_records()
-    df = pd.DataFrame(data)
-
-    if not df.empty:
-        # Select Patient (Only show unique names for better UI)
-        selected_patient = st.selectbox("Select a patient to review", df["Patient Name"].unique())
-
-        # Fetch Latest Entry for the Selected Patient
-        patient_data = df[df["Patient Name"] == selected_patient].iloc[-1]
-
-        # Display Patient Information
-        st.write(f"**Age:** {patient_data['Age']}")
-        st.write(f"**Oxygen Level:** {patient_data['Oxygen Level']}%")
-        st.write(f"**Spirometry (FEV1):** {patient_data['Spirometry']}%")
-        st.write(f"**Peak Flow:** {patient_data['Peak Flow']} L/min")
-        st.write(f"**Symptoms:** {patient_data['Symptoms']}")
-
-        # Consultant Feedback Inputs
-        diagnosis = st.text_area("Diagnosis")
-        recommendation = st.text_area("Recommendation")
-
-        # Submit Feedback & Update Google Sheets
-        if st.button("Submit Feedback"):
-            matching_rows = df[df["Patient Name"] == selected_patient].index
-            if len(matching_rows) > 0:
-                row_index = matching_rows[-1] + 2  # Updates the latest entry
-                sheet.update_cell(row_index, 7, diagnosis)
-                sheet.update_cell(row_index, 8, recommendation)
-                st.success("Feedback submitted successfully!")
-            else:
-                st.error("Patient record not found!")
