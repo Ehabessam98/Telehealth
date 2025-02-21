@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "telehealth-451612",
+  "private_key_id": "552e5b1a48f7f48d5aa510f5965ca670f92c9003",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDmkNNlmmTcNTPk\n6a+Djm/kl7+V6tVDWUFdUJ7LTP767STrxeepGhjnEtp8i1TeOjCoJMZlTBljbaTR\n+EzxQ+16bCTyILqPlpfIYBV0JwnSI7gLDwjZuoQZOpNXH2fMexlP/pHzebAZmgrh\nfSIzgyjWRM571a9tu5XP0/YfG3XcUsJ/e2bwN2FtyO8KZ7bYPqAC9QhJL/Ist1OI\nbWKnnEgN0K3xFPkGOsFc4d7e2At+JfbSd3Q4Aa4XKjLANyd2tYUcJwEiZEgNDQl2\ngtOLXV370cYUI4UQmq9OoBjj1/SrJWAb0NxTnp4cR4G196DBwEuHlK/vjEQ7XPkp\nLTDpveVRAgMBAAECggEAMT238CiXptHz+c0Qr3OBoRvpjk5/amlLBO9dYoTYpeV0\nr6fuEFbi/6Kup8+n+egKkTZ9ao/kkjAN9cvmPtanhrBG+bEUturOEry2iD54Ifl/\n6li1Jq7nXG3+nqo15F1b7BItwIZ6HhWggkTTw5Wc6Jn8UUUzOKfJ2H9nvoACXWGl\nigpoWqWFscaVf0GlGDYbJpDMpJrsic12UMof8cgjDW/NbG/jzLaWx/1+TOCFOWRY\nUeK3iQys7QB9VPXlGr/073Dc6UL1GXVA2Vt6YG3hPJOZXFku6EkC2jpcwiAw52G6\nZqAwOHERU9jv/g/IK35I8ebXb483yM211dntlURHiwKBgQD9xRMQl46HR5kLyqCQ\nnwWsMyE6zFoOcpL5nzho9LT+y5uysMutndACX6UFC9C3Amy1G0JHa2F3wv2LVhz7\nuPz2RvWTfWuqGtQsVJGDHb7HDFOzY4cHdWOZzjpTxQlPfbvS/4BdmCrEihFC0oBN\nKhusPvogmX1qMeCmyK87/8o8OwKBgQDol4wYww5yzbiTPb6/Ze3tm7ggK64muryG\nNJdo0GUisTRHotjQabe2MKySYC2VEWH2YgUgu2R8WZSsglwylpHHdh1d1t6VUuhD\nFKO9pCW0v94ZIQgf0s0EHxSEAdPBvthZPfUxV/m9L6izNvvThyMLuSqEPrLRXffz\n0vwBYmCn4wKBgQDnkxijsnn5Dyglb4H4l3UYwAvZ2TNxLbLboiVa+bvVK75oYRds\n1q9ECz3OjgqnhsnmtvpTrDTkkgbHSQzn1NbacsSVFAXU0+i8j2u+J725bJFRCUjm\nUIRUjbICUbL+XDGzCT99qWeVtJytyuQUBpH8K/gbGZYt+1gTOt1WNkS5kwKBgQCl\n3tWRHyGhq6YSkzkB493+0ktH3f6vLgKeLsk/fUZyrC7dW3wFfS7/ZczcAmzfXuse\nux5vDlSF/ZhyQfEgPpKtzUT6E+7eTKbIl+KBrpsZQK9R+mWB1GJSqxuFXIw4IjLF\nydKfIt8+FMvZKsACROAwTxfMAa6icsIOBwuirRbDAwKBgCXcYZLuEUmsf5jZeEMc\nleoNo2iZEB0n6GqvrrmDC74UWgTlWc3kSWew2qCf0dOgKa6Q6H0WM3Kh7AobTDDE\ny4FXq/ABJBKK8mCPlIVpA3/q6u04xfQRMf+RtD8PyT7OONfv4tXMzpXpSidrT8DR\nkl4Nvd9bS2I6blcHjo4spPHG\n-----END PRIVATE KEY-----\n",
+  "client_email": "streamlit-google-sheets@telehealth-451612.iam.gserviceaccount.com",
+  "client_id": "107786520107880615449",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streamlit-google-sheets%40telehealth-451612.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
