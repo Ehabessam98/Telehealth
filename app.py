@@ -2,18 +2,22 @@ import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+import json
 
-# Google Sheets Setup
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-SERVICE_ACCOUNT_FILE = "service_account.json"  # Your uploaded JSON file
-
-creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+# Load service account credentials from Streamlit secrets
+service_account_info = st.secrets["google"]
+creds = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
 client = gspread.authorize(creds)
 
-# Your Google Sheets URL
-SHEET_URL ="https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
-  # Replace with your actual Google Sheets link
+# Google Sheets Setup
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
 sheet = client.open_by_url(SHEET_URL).sheet1
+
+# Ensure sheet has headers
+headers = ["Patient Name", "Age", "Oxygen Level", "Spirometry", "Peak Flow", "Symptoms", "Diagnosis", "Recommendation"]
+existing_data = sheet.get_all_values()
+if not existing_data or existing_data[0] != headers:
+    sheet.insert_row(headers, 1)
 
 # Streamlit UI
 st.title("COPD Telehealth Program")
@@ -63,4 +67,3 @@ elif role == "Consultant":
             sheet.update_cell(row_index, 7, diagnosis)
             sheet.update_cell(row_index, 8, recommendation)
             st.success("Feedback submitted successfully!")
-
