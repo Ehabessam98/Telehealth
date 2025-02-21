@@ -19,6 +19,9 @@ except Exception:
     st.error("🚨 Error: Unable to authenticate with Google Sheets. Check your credentials.")
     st.stop()
 
+# Define submission date
+submission_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 # Title and Header
 st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
@@ -84,7 +87,6 @@ if st.button("Send Data to Remote Consultant"):
          (not national_id.isdigit() or len(national_id) != 14 or national_id[0] not in ["2", "3"]):
         st.warning("⚠ Invalid phone number or national ID format.")
     else:
-        submission_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         st.success("✅ Data sent successfully!")
         st.info("Consultant is reviewing the data...")
 
