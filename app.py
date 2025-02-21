@@ -75,8 +75,9 @@ with col2:
     else:
         st.success(severity_message)
 
-# Initialize submission_date with a default value
+# Initialize submission_date
 submission_date = "Not Submitted"
+recommendation = "Not Available"
 
 # Teleconsultation Process
 st.subheader("📞 Teleconsultation Process")
