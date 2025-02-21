@@ -1,41 +1,12 @@
 import streamlit as st
+import pandas as pd
+import datetime
 
-# Set page configuration
-st.set_page_config(page_title="COPD Telehealth", layout="wide")
-
-# Customizing the style
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #F5E8C7;
-    }
-    .stButton>button {
-        background-color: #E67E22;
-        color: white;
-        border-radius: 8px;
-        width: 100%;
-    }
-    .stSuccess {
-        color: green;
-    }
-    .stError {
-        color: red;
-    }
-    .css-1cpxqw2 {
-        background-color: #F4D03F !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Title with styling
-st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
+# Title
+st.title("COPD Telehealth Program - Rural to Remote Consultant Model")
 
 # Sidebar for Patient Info
-st.sidebar.header("🩺 Patient Information")
+st.sidebar.header("Patient Information")
 patient_name = st.sidebar.text_input("Patient Name", "John Doe")
 age = st.sidebar.slider("Age", 40, 90, 65)
 oxygen_level = st.sidebar.slider("Oxygen Saturation (%)", 70, 100, 95)
@@ -43,80 +14,62 @@ spirometry_value = st.sidebar.slider("Spirometry (FEV1 %)", 30, 100, 65)
 peak_flow = st.sidebar.slider("Peak Flow (L/min)", 100, 600, 350)
 symptoms = st.sidebar.text_area("Symptoms", "Shortness of breath, fatigue")
 
-# Main layout
-col1, col2 = st.columns([1, 2])
+# Display Patient Data
+st.subheader(f"Patient: {patient_name}")
+st.write(f"**Age:** {age}")
+st.write(f"**Oxygen Level:** {oxygen_level}%")
+st.write(f"**Spirometry (FEV1):** {spirometry_value}%")
+st.write(f"**Peak Flow:** {peak_flow} L/min")
+st.write(f"**Symptoms:** {symptoms}")
 
-with col1:
-    st.subheader("👤 Patient Details")
-    st.info(f"**Name:** {patient_name}")
-    st.write(f"**Age:** {age}")
-    st.write(f"**Oxygen Level:** {oxygen_level}%")
-    st.write(f"**Spirometry (FEV1):** {spirometry_value}%")
-    st.write(f"**Peak Flow:** {peak_flow} L/min")
-    st.write(f"**Symptoms:** {symptoms}")
+# Teleconsultation Process Simulation
+st.subheader("Teleconsultation Process")
 
-# Severity Assessment
-def assess_severity(oxygen, fev1):
-    if oxygen < 90 or fev1 < 50:
-        return "🔴 High Risk - Needs Urgent Attention!", "danger"
-    elif 90 <= oxygen <= 94 or 50 <= fev1 < 70:
-        return "🟠 Moderate Risk - Requires Monitoring.", "warning"
-    else:
-        return "🟢 Low Risk - Stable Condition.", "success"
-
-severity_message, severity_status = assess_severity(oxygen_level, spirometry_value)
-
-with col2:
-    st.subheader("📊 Severity Assessment")
-    if severity_status == "danger":
-        st.error(severity_message)
-    elif severity_status == "warning":
-        st.warning(severity_message)
-    else:
-        st.success(severity_message)
-
-# Teleconsultation Process
-st.subheader("📞 Teleconsultation Process")
 if st.button("Send Data to Remote Consultant"):
-    st.success("✅ Data sent successfully!")
+    st.success("Data sent to the chest consultant successfully!")
     st.info("Consultant is reviewing the data...")
 
-    # Simulated Diagnosis & Recommendation
-    diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
-    
-    st.subheader("💡 Consultant's Recommendation")
-    if diagnosis == "Stable":
-        st.success("✔ Patient is stable. Continue current treatment and monitor regularly.")
+    # AI-Generated Consultant Feedback
+    if oxygen_level < 88 or spirometry_value < 50 or peak_flow < 200:
+        diagnosis = "❌ Critical Condition - Immediate medical intervention needed!"
+        recommendation = "Consider hospitalization, oxygen therapy, and medication adjustment."
+    elif 88 <= oxygen_level <= 92 or 50 <= spirometry_value <= 65:
+        diagnosis = "⚠ Moderate Condition - Close monitoring required!"
+        recommendation = "Adjust medications, schedule regular follow-ups, and monitor oxygen levels daily."
     else:
-        st.error("⚠ Immediate intervention needed! Consider medication adjustment or hospitalization.")
+        diagnosis = "✅ Stable Condition - Continue current treatment!"
+        recommendation = "Maintain medications and follow-up as scheduled."
 
-st.write("**Workflow:** 🏥 Rural hospital → 🩺 Nurse collects data → 👨‍⚕️ Consultant reviews → 🏠 Patient receives treatment plan.")
+    st.subheader("Consultant's Recommendation")
+    st.write(f"**Diagnosis:** {diagnosis}")
+    st.write(f"**Recommendation:** {recommendation}")
 
-# Next Steps
-st.subheader("✅ Next Steps")
-st.write("✔ Train nurses on telehealth devices.")
-st.write("✔ Set up secure video consultation platform.")
-st.write("✔ Establish a follow-up plan for COPD patients.")
+    # Save Data for Analysis
+    patient_record = {
+        "Name": patient_name,
+        "Age": age,
+        "Oxygen Level": oxygen_level,
+        "Spirometry": spirometry_value,
+        "Peak Flow": peak_flow,
+        "Symptoms": symptoms,
+        "Diagnosis": diagnosis,
+        "Recommendation": recommendation,
+        "Timestamp": datetime.datetime.now()
+    }
 
-# Option to Download Report
-import pandas as pd
+    df = pd.DataFrame([patient_record])
 
-patient_data = {
-    "Name": [patient_name],
-    "Age": [age],
-    "Oxygen Level (%)": [oxygen_level],
-    "Spirometry (FEV1 %)": [spirometry_value],
-    "Peak Flow (L/min)": [peak_flow],
-    "Symptoms": [symptoms],
-    "Risk Assessment": [severity_message]
-}
+    # Append data to a CSV file
+    try:
+        df.to_csv("patient_records.csv", mode="a", header=False, index=False)
+        st.success("Patient record saved successfully! ✅")
+    except:
+        st.error("Failed to save data! Please check file permissions.")
 
-df = pd.DataFrame(patient_data)
+st.write("**Workflow:** Rural hospital → Nurse collects data → Consultant reviews → Patient receives treatment plan.")
 
-st.download_button(
-    label="📥 Download Patient Report (CSV)",
-    data=df.to_csv(index=False).encode("utf-8"),
-    file_name=f"{patient_name}_COPD_Report.csv",
-    mime="text/csv",
-)
-
+# Conclusion
+st.subheader("Next Steps")
+st.write("✅ Train nurses on telehealth devices.")
+st.write("✅ Set up secure video consultation platform.")
+st.write("✅ Establish a follow-up plan for COPD patients.")
