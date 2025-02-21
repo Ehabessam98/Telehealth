@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import gspread
-import json
 from oauth2client.service_account import ServiceAccountCredentials
 
 # Set page configuration
@@ -9,41 +8,17 @@ st.set_page_config(page_title="COPD Telehealth", layout="wide")
 
 # Load Google Sheets credentials from Streamlit secrets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds_json = st.secrets["gcp_service_account"]
-
-# Ensure creds_json is correctly formatted
-if isinstance(creds_json, str):
-    creds_dict = json.loads(creds_json)  # Convert JSON string to dict
-elif isinstance(creds_json, dict):
-    creds_dict = creds_json  # Already a dict, no need to parse
-else:
-    st.error("Invalid credentials format. Please check your Streamlit secrets.")
-    st.stop()
 
 try:
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
     client = gspread.authorize(creds)
     spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0")
     worksheet = spreadsheet.sheet1
-except Exception as e:
-    st.error(f"Google Sheets authentication failed: {e}")
+except Exception:
+    st.error("🚨 Error: Unable to authenticate with Google Sheets. Check your credentials.")
     st.stop()
 
-# Customizing the style
-st.markdown(
-    """
-    <style>
-    body { background-color: #F5E8C7; }
-    .stButton>button { background-color: #E67E22; color: white; border-radius: 8px; width: 100%; }
-    .stSuccess { color: green; }
-    .stError { color: red; }
-    .css-1cpxqw2 { background-color: #F4D03F !important; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Title with styling
+# Title and Header
 st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
 
@@ -90,24 +65,24 @@ with col2:
 # Teleconsultation Process
 st.subheader("📞 Teleconsultation Process")
 if st.button("Send Data to Remote Consultant"):
-    st.success("✅ Data sent successfully!")
-    st.info("Consultant is reviewing the data...")
+    if not patient_name.strip() or not symptoms.strip():
+        st.warning("⚠ Please fill in all required fields before submitting!")
+    else:
+        st.success("✅ Data sent successfully!")
+        st.info("Consultant is reviewing the data...")
 
-    try:
         # Save patient data to Google Sheets
         new_data = [patient_name, age, oxygen_level, spirometry_value, peak_flow, symptoms, severity_message]
         worksheet.append_row(new_data)
-    except Exception as e:
-        st.error(f"Failed to save data to Google Sheets: {e}")
 
-    # Simulated Diagnosis & Recommendation
-    diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
-    
-    st.subheader("💡 Consultant's Recommendation")
-    if diagnosis == "Stable":
-        st.success("✔ Patient is stable. Continue current treatment and monitor regularly.")
-    else:
-        st.error("⚠ Immediate intervention needed! Consider medication adjustment or hospitalization.")
+        # Simulated Diagnosis & Recommendation
+        diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
+
+        st.subheader("💡 Consultant's Recommendation")
+        if diagnosis == "Stable":
+            st.success("✔ Patient is stable. Continue current treatment and monitor regularly.")
+        else:
+            st.error("⚠ Immediate intervention needed! Consider medication adjustment or hospitalization.")
 
 st.write("**Workflow:** 🏥 Rural hospital → 🩺 Nurse collects data → 👨‍⚕️ Consultant reviews → 🏠 Patient receives treatment plan.")
 
