@@ -11,7 +11,7 @@ creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPE
 client = gspread.authorize(creds)
 
 # Your Google Sheets URL
-SHEET_URL = SHEET_URL = "https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
+SHEET_URL ="https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
   # Replace with your actual Google Sheets link
 sheet = client.open_by_url(SHEET_URL).sheet1
 
