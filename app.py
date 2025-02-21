@@ -21,7 +21,7 @@ except Exception:
 
 # Title and Header
 st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #D35400;'>Telehealth for COPD</h2>", unsafe_allow_html=True)
 
 # Sidebar for Patient Info
 st.sidebar.header("🩺 Patient Information")
