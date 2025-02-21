@@ -75,6 +75,9 @@ with col2:
     else:
         st.success(severity_message)
 
+# Initialize submission_date with a default value
+submission_date = "Not Submitted"
+
 # Teleconsultation Process
 st.subheader("📞 Teleconsultation Process")
 if st.button("Send Data to Remote Consultant"):
@@ -107,7 +110,7 @@ patient_data = {
     "Name": [patient_name],
     "Phone Number": [phone_number],
     "National ID": [national_id],
-    "Submission Date": [submission_date],
+    "Submission Date": [submission_date],  # Now always defined
     "Age": [age],
     "Oxygen Level (%)": [oxygen_level],
     "Spirometry (FEV1 % Predicted)": [spirometry_value],
