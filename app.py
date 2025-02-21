@@ -1,30 +1,29 @@
 import streamlit as st
+import pandas as pd
+import gspread
+import json
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Set page configuration
 st.set_page_config(page_title="COPD Telehealth", layout="wide")
+
+# Load Google Sheets credentials from Streamlit secrets
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds_json = st.secrets["gcp_service_account"]
+creds = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(creds_json), scope)
+client = gspread.authorize(creds)
+spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0")
+worksheet = spreadsheet.sheet1
 
 # Customizing the style
 st.markdown(
     """
     <style>
-    body {
-        background-color: #F5E8C7;
-    }
-    .stButton>button {
-        background-color: #E67E22;
-        color: white;
-        border-radius: 8px;
-        width: 100%;
-    }
-    .stSuccess {
-        color: green;
-    }
-    .stError {
-        color: red;
-    }
-    .css-1cpxqw2 {
-        background-color: #F4D03F !important;
-    }
+    body { background-color: #F5E8C7; }
+    .stButton>button { background-color: #E67E22; color: white; border-radius: 8px; width: 100%; }
+    .stSuccess { color: green; }
+    .stError { color: red; }
+    .css-1cpxqw2 { background-color: #F4D03F !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -45,7 +44,6 @@ symptoms = st.sidebar.text_area("Symptoms", "Shortness of breath, fatigue")
 
 # Main layout
 col1, col2 = st.columns([1, 2])
-
 with col1:
     st.subheader("👤 Patient Details")
     st.info(f"**Name:** {patient_name}")
@@ -81,6 +79,10 @@ if st.button("Send Data to Remote Consultant"):
     st.success("✅ Data sent successfully!")
     st.info("Consultant is reviewing the data...")
 
+    # Save patient data to Google Sheets
+    new_data = [patient_name, age, oxygen_level, spirometry_value, peak_flow, symptoms, severity_message]
+    worksheet.append_row(new_data)
+
     # Simulated Diagnosis & Recommendation
     diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
     
@@ -99,8 +101,6 @@ st.write("✔ Set up secure video consultation platform.")
 st.write("✔ Establish a follow-up plan for COPD patients.")
 
 # Option to Download Report
-import pandas as pd
-
 patient_data = {
     "Name": [patient_name],
     "Age": [age],
@@ -119,4 +119,3 @@ st.download_button(
     file_name=f"{patient_name}_COPD_Report.csv",
     mime="text/csv",
 )
-
