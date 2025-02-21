@@ -21,7 +21,7 @@ except Exception:
 
 # Title and Header
 st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center; color: #D35400;'>Telehealth for COPD</h2>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #D35400;'>Beta Version App</h2>", unsafe_allow_html=True)
 
 # Sidebar for Patient Info
 st.sidebar.header("🩺 Patient Information")
@@ -136,3 +136,11 @@ st.download_button(
     file_name=f"{patient_name}_COPD_Report.csv",
     mime="text/csv",
 )
+# Footer
+st.markdown("""
+    <hr>
+    <p style='text-align: center; color: gray;'>
+        Developed by <b>Dr. Ehab Essam</b>, <b>Dr. Eman Nageib</b>, <b>Dr. Zeinab Azzam</b>, 
+        <b>Dr. Ahmed Mamdouh</b>, and <b>Dr. Fatma Saeed</b>.
+    </p>
+""", unsafe_allow_html=True)
