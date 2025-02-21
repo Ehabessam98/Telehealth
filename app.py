@@ -137,10 +137,14 @@ st.download_button(
     mime="text/csv",
 )
 # Footer
-st.markdown("""
-    <hr>
-    <p style='text-align: center; color: gray;'>
-        Developed by <b>Dr. Ehab Essam</b>, <b>Dr. Eman Nageib</b>, <b>Dr. Zeinab Azzam</b>, 
-        <b>Dr. Ahmed Mamdouh</b>, and <b>Dr. Fatma Saeed</b>.
-    </p>
-""", unsafe_allow_html=True)
+st.write("---")  # Adds a horizontal line for separation
+st.markdown(
+    """
+    <div style="text-align: center; color: gray;">
+        <small>Developed by <b>Dr. Ehab Essam</b>, <b>Dr. Eman Nageib</b>, <b>Dr. Zeinab Azzam</b>, 
+        <b>Dr. Ahmed Mamdouh</b>, and <b>Dr. Fatma Saeed</b>.</small>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
