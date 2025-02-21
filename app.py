@@ -91,17 +91,24 @@ if st.button("Send Data to Remote Consultant"):
         st.success("✅ Data sent successfully!")
         st.info("Consultant is reviewing the data...")
 
-        # Save patient data to Google Sheets
-        new_data = [patient_name, phone_number, national_id, submission_date, age, oxygen_level, spirometry_value, peak_flow, symptoms, severity_message, "Pending"]
-        worksheet.append_row(new_data)
-
         # Simulated Diagnosis & Recommendation
-        diagnosis = "Stable" if oxygen_level > 92 and spirometry_value > 50 else "Needs Immediate Attention"
+        if oxygen_level > 92 and spirometry_value > 50:
+            diagnosis = "Stable"
+            recommendation = "✔ Patient is stable. Continue current treatment and monitor regularly."
+        else:
+            diagnosis = "Needs Immediate Attention"
+            recommendation = "⚠ Immediate intervention needed! Consider medication adjustment or hospitalization."
+
+        # Display Consultant's Recommendation
         st.subheader("💡 Consultant's Recommendation")
         if diagnosis == "Stable":
-            st.success("✔ Patient is stable. Continue current treatment and monitor regularly.")
+            st.success(recommendation)
         else:
-            st.error("⚠ Immediate intervention needed! Consider medication adjustment or hospitalization.")
+            st.error(recommendation)
+
+        # Save patient data including recommendation to Google Sheets
+        new_data = [patient_name, phone_number, national_id, submission_date, age, oxygen_level, spirometry_value, peak_flow, symptoms, severity_message, recommendation]
+        worksheet.append_row(new_data)
 
 st.write("**Workflow:** 🏥 Rural hospital → 🩺 Nurse collects data → 👨‍⚕️ Consultant reviews → 🏠 Patient receives treatment plan.")
 
@@ -110,13 +117,14 @@ patient_data = {
     "Name": [patient_name],
     "Phone Number": [phone_number],
     "National ID": [national_id],
-    "Submission Date": [submission_date],  # Now always defined
+    "Submission Date": [submission_date],
     "Age": [age],
     "Oxygen Level (%)": [oxygen_level],
     "Spirometry (FEV1 % Predicted)": [spirometry_value],
     "Peak Flow (L/min)": [peak_flow],
     "Symptoms": [symptoms],
-    "Risk Assessment": [severity_message]
+    "Risk Assessment": [severity_message],
+    "Consultant Recommendation": [recommendation]
 }
 
 df = pd.DataFrame(patient_data)
