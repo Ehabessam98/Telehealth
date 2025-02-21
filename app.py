@@ -19,9 +19,6 @@ except Exception:
     st.error("🚨 Error: Unable to authenticate with Google Sheets. Check your credentials.")
     st.stop()
 
-# Define submission date
-submission_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
 # Title and Header
 st.markdown("<h1 style='text-align: center; color: #E74C3C;'>COPD Telehealth Program</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center; color: #D35400;'>Rural to Remote Consultant Model</h2>", unsafe_allow_html=True)
@@ -31,9 +28,9 @@ st.sidebar.header("🩺 Patient Information")
 patient_name = st.sidebar.text_input("Patient Name", "John Doe")
 phone_number = st.sidebar.text_input("Phone Number (11 digits starting with 0)")
 national_id = st.sidebar.text_input("National ID (14 digits starting with 2 or 3)")
-age = st.sidebar.slider("Age", 40, 90, 65)
+age = st.sidebar.slider("Age", 20, 90, 65)
 oxygen_level = st.sidebar.slider("Oxygen Saturation (%)", 70, 100, 95)
-spirometry_value = st.sidebar.slider("Spirometry (FEV1 %)", 30, 100, 65)
+spirometry_value = st.sidebar.slider("Spirometry (FEV1 % Predicted)", 30, 100, 65)
 peak_flow = st.sidebar.slider("Peak Flow (L/min)", 100, 600, 350)
 symptoms = st.sidebar.text_area("Symptoms", "Shortness of breath, fatigue")
 
@@ -54,15 +51,15 @@ with col1:
     st.write(f"**National ID:** {national_id}")
     st.write(f"**Age:** {age}")
     st.write(f"**Oxygen Level:** {oxygen_level}%")
-    st.write(f"**Spirometry (FEV1):** {spirometry_value}%")
+    st.write(f"**Spirometry (FEV1 % Predicted):** {spirometry_value}%")
     st.write(f"**Peak Flow:** {peak_flow} L/min")
     st.write(f"**Symptoms:** {symptoms}")
 
 # Severity Assessment
 def assess_severity(oxygen, fev1):
-    if oxygen < 90 or fev1 < 50:
+    if oxygen < 88 or fev1 < 50:
         return "🔴 High Risk - Needs Urgent Attention!", "danger"
-    elif 90 <= oxygen <= 94 or 50 <= fev1 < 70:
+    elif 88 <= oxygen <= 92 or 50 <= fev1 < 80:
         return "🟠 Moderate Risk - Requires Monitoring.", "warning"
     else:
         return "🟢 Low Risk - Stable Condition.", "success"
@@ -87,6 +84,7 @@ if st.button("Send Data to Remote Consultant"):
          (not national_id.isdigit() or len(national_id) != 14 or national_id[0] not in ["2", "3"]):
         st.warning("⚠ Invalid phone number or national ID format.")
     else:
+        submission_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         st.success("✅ Data sent successfully!")
         st.info("Consultant is reviewing the data...")
 
@@ -112,7 +110,7 @@ patient_data = {
     "Submission Date": [submission_date],
     "Age": [age],
     "Oxygen Level (%)": [oxygen_level],
-    "Spirometry (FEV1 %)": [spirometry_value],
+    "Spirometry (FEV1 % Predicted)": [spirometry_value],
     "Peak Flow (L/min)": [peak_flow],
     "Symptoms": [symptoms],
     "Risk Assessment": [severity_message]
