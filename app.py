@@ -1,90 +1,66 @@
 import streamlit as st
 import pandas as pd
-import datetime
-import os
+import gspread
+from google.oauth2.service_account import Credentials
 
-# Title
-st.title("🚑 COPD Telehealth Program - Rural to Remote Consultant Model")
+# Google Sheets Setup
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SERVICE_ACCOUNT_FILE = "service_account.json"  # Your uploaded JSON file
 
-# Sidebar for Patient Info
-st.sidebar.header("📋 Patient Information")
-patient_name = st.sidebar.text_input("Patient Name", "John Doe")
-age = st.sidebar.slider("Age", 40, 90, 65)
-oxygen_level = st.sidebar.slider("Oxygen Saturation (%)", 70, 100, 95)
-spirometry_value = st.sidebar.slider("Spirometry (FEV1 %)", 30, 100, 65)
-peak_flow = st.sidebar.slider("Peak Flow (L/min)", 100, 600, 350)
-symptoms = st.sidebar.text_area("Symptoms", "Shortness of breath, fatigue")
+creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+client = gspread.authorize(creds)
 
-# Display Patient Data
-st.subheader(f"🩺 Patient: {patient_name}")
-st.write(f"**Age:** {age}")
-st.write(f"**Oxygen Level:** {oxygen_level}%")
-st.write(f"**Spirometry (FEV1):** {spirometry_value}%")
-st.write(f"**Peak Flow:** {peak_flow} L/min")
-st.write(f"**Symptoms:** {symptoms}")
+# Your Google Sheets URL
+SHEET_URL = SHEET_URL = "https://docs.google.com/spreadsheets/d/1SlogwnD9k-MTkCG1o-wwngsacp_ObovVIMobMd9Qo3Y/edit#gid=0"
+  # Replace with your actual Google Sheets link
+sheet = client.open_by_url(SHEET_URL).sheet1
 
-# AI-Generated Consultant Feedback
-st.subheader("📡 Teleconsultation Process")
-if st.button("📤 Send Data to Remote Consultant"):
-    st.success("✅ Data sent to the chest consultant successfully!")
-    st.info("Consultant is reviewing the data...")
+# Streamlit UI
+st.title("COPD Telehealth Program")
 
-    # Diagnosis & Recommendation Logic
-    if oxygen_level < 88 or spirometry_value < 50 or peak_flow < 200:
-        diagnosis = "❌ Critical Condition - Immediate medical intervention needed!"
-        recommendation = "Consider hospitalization, oxygen therapy, and medication adjustment."
-    elif 88 <= oxygen_level <= 92 or 50 <= spirometry_value <= 65:
-        diagnosis = "⚠ Moderate Condition - Close monitoring required!"
-        recommendation = "Adjust medications, schedule regular follow-ups, and monitor oxygen levels daily."
-    else:
-        diagnosis = "✅ Stable Condition - Continue current treatment!"
-        recommendation = "Maintain medications and follow-up as scheduled."
-    
-    st.subheader("📝 Consultant's Recommendation")
-    st.write(f"**Diagnosis:** {diagnosis}")
-    st.write(f"**Recommendation:** {recommendation}")
-    
-    # Save Data to CSV
-    patient_record = {
-        "Name": patient_name,
-        "Age": age,
-        "Oxygen Level": oxygen_level,
-        "Spirometry": spirometry_value,
-        "Peak Flow": peak_flow,
-        "Symptoms": symptoms,
-        "Diagnosis": diagnosis,
-        "Recommendation": recommendation,
-        "Timestamp": datetime.datetime.now()
-    }
+# Choose Role: GP or Consultant
+role = st.sidebar.selectbox("Select Role", ["General Practitioner (GP)", "Consultant"])
 
-    file_path = "patient_records.csv"
-    if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-        df = pd.concat([df, pd.DataFrame([patient_record])], ignore_index=True)
-    else:
-        df = pd.DataFrame([patient_record])
-    
-    df.to_csv(file_path, index=False)
-    st.success("✅ Patient record saved successfully!")
+if role == "General Practitioner (GP)":
+    st.header("GP Interface - Enter Patient Data")
 
-# Display Past Records
-st.subheader("📊 Patient History")
-if os.path.exists("patient_records.csv"):
-    df = pd.read_csv("patient_records.csv")
-    st.dataframe(df.tail(5))
-else:
-    st.write("No patient records found.")
+    # Patient Data Inputs
+    patient_name = st.text_input("Patient Name")
+    age = st.slider("Age", 1, 100, 40)
+    oxygen_level = st.slider("Oxygen Saturation (%)", 70, 100, 95)
+    spirometry_value = st.slider("Spirometry (FEV1 %)", 30, 100, 65)
+    peak_flow = st.slider("Peak Flow (L/min)", 100, 600, 350)
+    symptoms = st.text_area("Symptoms", "Shortness of breath, fatigue")
 
-# Consultant Feedback Section
-st.subheader("🩺 Consultant Feedback")
-consultant_feedback = st.text_area("Enter Consultant's Feedback")
-if st.button("💾 Save Feedback"):
-    if consultant_feedback.strip():
-        feedback_record = {"Consultant Feedback": consultant_feedback, "Timestamp": datetime.datetime.now()}
-        feedback_df = pd.DataFrame([feedback_record])
-        feedback_df.to_csv("consultant_feedback.csv", mode="a", header=not os.path.exists("consultant_feedback.csv"), index=False)
-        st.success("Feedback saved successfully!")
-    else:
-        st.warning("Please enter some feedback before saving!")
+    if st.button("Send to Consultant"):
+        new_data = [patient_name, age, oxygen_level, spirometry_value, peak_flow, symptoms, "", ""]
+        sheet.append_row(new_data)
+        st.success("Patient data sent to consultant!")
 
-st.write("**Workflow:** Rural hospital → Nurse collects data → Consultant reviews → Patient receives treatment plan.")
+elif role == "Consultant":
+    st.header("Consultant Interface - Review & Provide Feedback")
+
+    # Fetch Data from Google Sheets
+    data = sheet.get_all_records()
+    df = pd.DataFrame(data)
+
+    if not df.empty:
+        selected_patient = st.selectbox("Select a patient to review", df["Patient Name"])
+        patient_data = df[df["Patient Name"] == selected_patient].iloc[0]
+
+        st.write(f"**Age:** {patient_data['Age']}")
+        st.write(f"**Oxygen Level:** {patient_data['Oxygen Level']}%")
+        st.write(f"**Spirometry (FEV1):** {patient_data['Spirometry']}%")
+        st.write(f"**Peak Flow:** {patient_data['Peak Flow']} L/min")
+        st.write(f"**Symptoms:** {patient_data['Symptoms']}")
+
+        # Consultant Feedback
+        diagnosis = st.text_area("Diagnosis")
+        recommendation = st.text_area("Recommendation")
+
+        if st.button("Submit Feedback"):
+            row_index = df[df["Patient Name"] == selected_patient].index[0] + 2  # Adjust for header row
+            sheet.update_cell(row_index, 7, diagnosis)
+            sheet.update_cell(row_index, 8, recommendation)
+            st.success("Feedback submitted successfully!")
+
