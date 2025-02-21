@@ -1,3 +1,7 @@
 gspread
 oauth2client
 pandas
+gspread_dataframe
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
