@@ -2,10 +2,9 @@ import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
-import toml
 
 # Load Google service account credentials from Streamlit secrets
-service_account_info = toml.loads(st.secrets["google"])
+service_account_info = st.secrets["google"]  # Already a dictionary, no need to parse
 creds = Credentials.from_service_account_info(service_account_info, scopes=["https://www.googleapis.com/auth/spreadsheets"])
 client = gspread.authorize(creds)
 
